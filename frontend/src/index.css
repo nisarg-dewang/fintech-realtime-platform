@@ -1,0 +1,307 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0f1419;
+  color: #e6edf3;
+  min-height: 100vh;
+}
+#root {
+  min-height: 100vh;
+}
+a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+input, button, select {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button.link {
+  background: none;
+  border: none;
+  color: #58a6ff;
+  padding: 0;
+  text-decoration: underline;
+}
+button.link:hover {
+  text-decoration: none;
+}
+
+.page {
+  padding: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 360px;
+}
+.card h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+.card .subtitle {
+  color: #8b949e;
+  margin: 0 0 1.5rem;
+}
+.card form input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+}
+.card form button[type="submit"] {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.5rem;
+  background: #238636;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+}
+.card form button[type="submit"]:hover:not(:disabled) {
+  background: #2ea043;
+}
+.card form button[type="submit"]:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.card .error {
+  color: #f85149;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+.card .footer {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #8b949e;
+}
+
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+}
+.nav {
+  display: flex;
+  gap: 1.5rem;
+}
+.nav a {
+  color: #e6edf3;
+  text-decoration: none;
+}
+.nav a:hover {
+  color: #58a6ff;
+}
+.user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.user span {
+  color: #8b949e;
+  font-size: 0.9rem;
+}
+.user button {
+  padding: 0.35rem 0.75rem;
+  background: transparent;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+}
+.user button:hover {
+  background: #21262d;
+}
+.main {
+  flex: 1;
+}
+
+.ws-status .connected { color: #3fb950; }
+.ws-status .disconnected { color: #f85149; }
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.market-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.market-card .symbol {
+  font-weight: 600;
+  color: #8b949e;
+}
+.market-card .price {
+  font-size: 1.25rem;
+}
+.hint, .muted {
+  color: #8b949e;
+  font-size: 0.9rem;
+}
+.balance-section {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+.positions-section, .buy-section {
+  margin-bottom: 1.5rem;
+}
+.positions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.positions-table th,
+.positions-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #30363d;
+}
+.positions-table th {
+  color: #8b949e;
+  font-weight: 600;
+}
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  background: #da3633;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+}
+.btn-sm:hover:not(:disabled) {
+  background: #b62324;
+}
+.btn-sm:disabled {
+  opacity: 0.7;
+}
+.buy-form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.buy-form select,
+.buy-form input {
+  padding: 0.5rem 0.75rem;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+}
+.buy-form input {
+  width: 100px;
+}
+.buy-form button {
+  padding: 0.5rem 1rem;
+  background: #238636;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+}
+.buy-form button:hover:not(:disabled) {
+  background: #2ea043;
+}
+.buy-form button:disabled {
+  opacity: 0.7;
+}
+.error {
+  color: #f85149;
+  margin-bottom: 0.75rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-width: 280px;
+}
+.modal h3 {
+  margin: 0 0 0.5rem;
+}
+.modal-hint {
+  color: #8b949e;
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+.modal input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+}
+.modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+.modal-actions button {
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  background: #21262d;
+  color: #e6edf3;
+}
+.modal-actions button[type="submit"] {
+  background: #da3633;
+  border-color: #da3633;
+  color: #fff;
+}
+.modal-actions button[type="submit"]:hover:not(:disabled) {
+  background: #b62324;
+}
+.modal-actions button:first-of-type {
+  background: transparent;
+  margin-right: auto;
+}
+.modal-actions button:first-of-type:hover {
+  background: #21262d;
+}
