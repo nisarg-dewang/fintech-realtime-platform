@@ -17,7 +17,17 @@ export class PortfolioController {
   @Get()
   @ApiOperation({ summary: 'Get current portfolio' })
   async getPortfolio(@CurrentUser() user: User) {
-    return this.portfolioService.getOrCreateForUser(user.id);
+    const portfolio = await this.portfolioService.getOrCreateForUser(user.id);
+    return {
+      id: portfolio.id,
+      balance: portfolio.balance,
+      positions: (portfolio.positions ?? []).map((p) => ({
+        id: p.id,
+        symbol: p.symbol,
+        quantity: p.quantity,
+        averagePrice: p.averagePrice,
+      })),
+    };
   }
 
   @Post('buy')

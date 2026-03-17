@@ -4,10 +4,9 @@ import { Repository } from 'typeorm';
 import { Portfolio } from './entities/portfolio.entity';
 import { Position } from './entities/position.entity';
 import { MarketService } from '../market/market.service';
-import { RedisService } from '../../redis/redis.service';
+import { RedisPubSubService } from '../../redis/redis-pubsub.service';
 
 const INITIAL_BALANCE = 100000;
-const TRADE_EXECUTED_CHANNEL = 'TRADE_EXECUTED';
 
 @Injectable()
 export class PortfolioService {
@@ -17,7 +16,7 @@ export class PortfolioService {
     @InjectRepository(Position)
     private readonly positionRepo: Repository<Position>,
     private readonly marketService: MarketService,
-    private readonly redis: RedisService,
+    private readonly redisPubSub: RedisPubSubService,
   ) {}
 
   async getOrCreateForUser(userId: string): Promise<Portfolio> {
@@ -64,7 +63,7 @@ export class PortfolioService {
     }
     const newBalance = (balance - cost).toFixed(2);
     await this.portfolioRepo.update(portfolio.id, { balance: newBalance });
-    const tradePayload = JSON.stringify({
+    await this.redisPubSub.publishTradeExecuted({
       userId,
       type: 'buy',
       symbol,
@@ -72,7 +71,6 @@ export class PortfolioService {
       price,
       timestamp: new Date().toISOString(),
     });
-    await this.redis.publish(TRADE_EXECUTED_CHANNEL, tradePayload);
     return this.getOrCreateForUser(userId);
   }
 
@@ -96,7 +94,7 @@ export class PortfolioService {
     }
     const newBalance = (parseFloat(portfolio.balance) + proceeds).toFixed(2);
     await this.portfolioRepo.update(portfolio.id, { balance: newBalance });
-    const tradePayload = JSON.stringify({
+    await this.redisPubSub.publishTradeExecuted({
       userId,
       type: 'sell',
       symbol,
@@ -104,7 +102,6 @@ export class PortfolioService {
       price,
       timestamp: new Date().toISOString(),
     });
-    await this.redis.publish(TRADE_EXECUTED_CHANNEL, tradePayload);
     return this.getOrCreateForUser(userId);
   }
 }

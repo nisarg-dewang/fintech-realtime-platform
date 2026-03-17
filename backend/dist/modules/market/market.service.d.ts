@@ -1,12 +1,27 @@
-import { OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { RedisService } from '../../redis/redis.service';
-export declare class MarketService implements OnModuleInit {
+export interface CandlePoint {
+    time: number;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+}
+export declare class MarketService {
     private readonly redis;
-    private prices;
-    private intervalId?;
-    constructor(redis: RedisService);
-    onModuleInit(): void;
-    private tick;
+    private readonly config;
+    private readonly logger;
+    constructor(redis: RedisService, config: ConfigService);
+    getLatestPrice(symbol: string): Promise<{
+        symbol: string;
+        price: number;
+        timestamp: number;
+    } | null>;
     getPrice(symbol: string): Promise<number | null>;
-    getPrices(): Record<string, number>;
+    getFeaturedList(): Promise<{
+        symbol: string;
+        description: string;
+        price: number | null;
+    }[]>;
+    getHistory(symbol: string, from: number, to: number, resolution?: number | 'D'): Promise<CandlePoint[]>;
 }

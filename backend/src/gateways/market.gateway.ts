@@ -6,11 +6,8 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { RedisService } from '../redis/redis.service';
+import { RedisPubSubService } from '../redis/redis-pubsub.service';
 import { Logger } from '@nestjs/common';
-
-const MARKET_UPDATE_CHANNEL = 'MARKET_UPDATE';
-const TRADE_EXECUTED_CHANNEL = 'TRADE_EXECUTED';
 
 @WebSocketGateway({
   cors: { origin: true },
@@ -21,23 +18,27 @@ export class MarketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   server!: Server;
 
   private readonly logger = new Logger(MarketGateway.name);
+  private connectionCount = 0;
 
-  constructor(private readonly redis: RedisService) {}
+  constructor(private readonly redisPubSub: RedisPubSubService) {}
 
   afterInit() {
-    this.redis.subscribe(MARKET_UPDATE_CHANNEL, (message) => {
-      this.server.emit('market_update', JSON.parse(message));
+    this.redisPubSub.registerMarketUpdateHandler((payload) => {
+      this.server.emit('market_update', payload);
     });
-    this.redis.subscribe(TRADE_EXECUTED_CHANNEL, (message) => {
-      this.server.emit('trade_executed', JSON.parse(message));
+    this.redisPubSub.registerTradeExecutedHandler((payload) => {
+      this.server.emit('trade_executed', payload);
     });
+    this.logger.log('WebSocket gateway initialized; subscribed to Redis MARKET_UPDATE and TRADE_EXECUTED');
   }
 
-  handleConnection() {
-    this.logger.log('Client connected');
+  handleConnection(client: { id: string }) {
+    this.connectionCount += 1;
+    this.logger.log(`Client connected: id=${client.id}, total connections=${this.connectionCount}`);
   }
 
-  handleDisconnect() {
-    this.logger.log('Client disconnected');
+  handleDisconnect(client: { id: string }) {
+    this.connectionCount = Math.max(0, this.connectionCount - 1);
+    this.logger.log(`Client disconnected: id=${client.id}, total connections=${this.connectionCount}`);
   }
 }

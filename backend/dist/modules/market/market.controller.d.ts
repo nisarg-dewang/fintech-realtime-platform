@@ -1,18 +1,21 @@
 import { MarketService } from './market.service';
-import { RedisService } from '../../redis/redis.service';
 export declare class MarketController {
     private readonly marketService;
-    private readonly redis;
-    constructor(marketService: MarketService, redis: RedisService);
+    constructor(marketService: MarketService);
+    getList(): Promise<{
+        symbol: string;
+        description: string;
+        price: number | null;
+    }[]>;
+    getHistory(symbol: string, from: string, to: string, resolution?: string): Promise<import("./market.service").CandlePoint[] | {
+        error: string;
+    }>;
     getPrice(symbol: string): Promise<{
         symbol: string;
         price: number;
-        source: string;
-        error?: undefined;
+        timestamp: number;
     } | {
         symbol: string;
         error: string;
-        price?: undefined;
-        source?: undefined;
     }>;
 }
