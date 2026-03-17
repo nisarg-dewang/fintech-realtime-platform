@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { auth } from '../api/client';
+import { authApi } from '../services/api';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -18,8 +18,8 @@ export default function Login() {
     setLoading(true);
     try {
       const res = isRegister
-        ? await auth.register(email, password)
-        : await auth.login(email, password);
+        ? await authApi.register(email, password)
+        : await authApi.login(email, password);
       login(res.access_token, res.user);
       navigate('/dashboard');
     } catch (err) {

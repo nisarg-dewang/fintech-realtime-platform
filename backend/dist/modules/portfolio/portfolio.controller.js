@@ -26,7 +26,17 @@ let PortfolioController = class PortfolioController {
         this.portfolioService = portfolioService;
     }
     async getPortfolio(user) {
-        return this.portfolioService.getOrCreateForUser(user.id);
+        const portfolio = await this.portfolioService.getOrCreateForUser(user.id);
+        return {
+            id: portfolio.id,
+            balance: portfolio.balance,
+            positions: (portfolio.positions ?? []).map((p) => ({
+                id: p.id,
+                symbol: p.symbol,
+                quantity: p.quantity,
+                averagePrice: p.averagePrice,
+            })),
+        };
     }
     async buy(user, dto) {
         return this.portfolioService.buy(user.id, dto.symbol, dto.quantity);

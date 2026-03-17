@@ -10,12 +10,13 @@ exports.MarketModule = void 0;
 const common_1 = require("@nestjs/common");
 const market_service_1 = require("./market.service");
 const market_controller_1 = require("./market.controller");
+const market_data_service_1 = require("./market-data.service");
 let MarketModule = class MarketModule {
 };
 exports.MarketModule = MarketModule;
 exports.MarketModule = MarketModule = __decorate([
     (0, common_1.Module)({
-        providers: [market_service_1.MarketService],
+        providers: [market_service_1.MarketService, market_data_service_1.MarketDataService],
         controllers: [market_controller_1.MarketController],
         exports: [market_service_1.MarketService],
     })

@@ -19,15 +19,14 @@ const typeorm_2 = require("typeorm");
 const portfolio_entity_1 = require("./entities/portfolio.entity");
 const position_entity_1 = require("./entities/position.entity");
 const market_service_1 = require("../market/market.service");
-const redis_service_1 = require("../../redis/redis.service");
+const redis_pubsub_service_1 = require("../../redis/redis-pubsub.service");
 const INITIAL_BALANCE = 100000;
-const TRADE_EXECUTED_CHANNEL = 'TRADE_EXECUTED';
 let PortfolioService = class PortfolioService {
-    constructor(portfolioRepo, positionRepo, marketService, redis) {
+    constructor(portfolioRepo, positionRepo, marketService, redisPubSub) {
         this.portfolioRepo = portfolioRepo;
         this.positionRepo = positionRepo;
         this.marketService = marketService;
-        this.redis = redis;
+        this.redisPubSub = redisPubSub;
     }
     async getOrCreateForUser(userId) {
         let portfolio = await this.portfolioRepo.findOne({
@@ -76,7 +75,7 @@ let PortfolioService = class PortfolioService {
         }
         const newBalance = (balance - cost).toFixed(2);
         await this.portfolioRepo.update(portfolio.id, { balance: newBalance });
-        const tradePayload = JSON.stringify({
+        await this.redisPubSub.publishTradeExecuted({
             userId,
             type: 'buy',
             symbol,
@@ -84,7 +83,6 @@ let PortfolioService = class PortfolioService {
             price,
             timestamp: new Date().toISOString(),
         });
-        await this.redis.publish(TRADE_EXECUTED_CHANNEL, tradePayload);
         return this.getOrCreateForUser(userId);
     }
     async sell(userId, symbol, quantity) {
@@ -112,7 +110,7 @@ let PortfolioService = class PortfolioService {
         }
         const newBalance = (parseFloat(portfolio.balance) + proceeds).toFixed(2);
         await this.portfolioRepo.update(portfolio.id, { balance: newBalance });
-        const tradePayload = JSON.stringify({
+        await this.redisPubSub.publishTradeExecuted({
             userId,
             type: 'sell',
             symbol,
@@ -120,7 +118,6 @@ let PortfolioService = class PortfolioService {
             price,
             timestamp: new Date().toISOString(),
         });
-        await this.redis.publish(TRADE_EXECUTED_CHANNEL, tradePayload);
         return this.getOrCreateForUser(userId);
     }
 };
@@ -132,6 +129,6 @@ exports.PortfolioService = PortfolioService = __decorate([
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
         market_service_1.MarketService,
-        redis_service_1.RedisService])
+        redis_pubsub_service_1.RedisPubSubService])
 ], PortfolioService);
 //# sourceMappingURL=portfolio.service.js.map

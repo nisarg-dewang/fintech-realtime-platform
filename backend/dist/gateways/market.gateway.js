@@ -13,28 +13,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MarketGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const redis_service_1 = require("../redis/redis.service");
+const redis_pubsub_service_1 = require("../redis/redis-pubsub.service");
 const common_1 = require("@nestjs/common");
-const MARKET_UPDATE_CHANNEL = 'MARKET_UPDATE';
-const TRADE_EXECUTED_CHANNEL = 'TRADE_EXECUTED';
 let MarketGateway = MarketGateway_1 = class MarketGateway {
-    constructor(redis) {
-        this.redis = redis;
+    constructor(redisPubSub) {
+        this.redisPubSub = redisPubSub;
         this.logger = new common_1.Logger(MarketGateway_1.name);
+        this.connectionCount = 0;
     }
     afterInit() {
-        this.redis.subscribe(MARKET_UPDATE_CHANNEL, (message) => {
-            this.server.emit('market_update', JSON.parse(message));
+        this.redisPubSub.registerMarketUpdateHandler((payload) => {
+            this.server.emit('market_update', payload);
         });
-        this.redis.subscribe(TRADE_EXECUTED_CHANNEL, (message) => {
-            this.server.emit('trade_executed', JSON.parse(message));
+        this.redisPubSub.registerTradeExecutedHandler((payload) => {
+            this.server.emit('trade_executed', payload);
         });
+        this.logger.log('WebSocket gateway initialized; subscribed to Redis MARKET_UPDATE and TRADE_EXECUTED');
     }
-    handleConnection() {
-        this.logger.log('Client connected');
+    handleConnection(client) {
+        this.connectionCount += 1;
+        this.logger.log(`Client connected: id=${client.id}, total connections=${this.connectionCount}`);
     }
-    handleDisconnect() {
-        this.logger.log('Client disconnected');
+    handleDisconnect(client) {
+        this.connectionCount = Math.max(0, this.connectionCount - 1);
+        this.logger.log(`Client disconnected: id=${client.id}, total connections=${this.connectionCount}`);
     }
 };
 exports.MarketGateway = MarketGateway;
@@ -47,6 +49,6 @@ exports.MarketGateway = MarketGateway = MarketGateway_1 = __decorate([
         cors: { origin: true },
         path: '/ws',
     }),
-    __metadata("design:paramtypes", [redis_service_1.RedisService])
+    __metadata("design:paramtypes", [redis_pubsub_service_1.RedisPubSubService])
 ], MarketGateway);
 //# sourceMappingURL=market.gateway.js.map
